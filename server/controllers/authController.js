@@ -1,7 +1,8 @@
 const model=require('../model/user');
 const bcrypt=require('bcrypt');
+const jwt=require('jsonwebtoken');
 
-async function registerUser(req,res){
+const registerUser= async (req,res)=>{
     const {username,email,password,phone_number,address}=req.body;
     const role_type='user';
     try{
@@ -28,8 +29,48 @@ async function registerUser(req,res){
         return res.status(500).json({message:'Internal server error'});
     }
 
-}
+};
 
-module.exports={
-    registerUser
-}
+const loginUser = async (req, res) => {
+    const {email, password} = req.body;
+    
+    try {
+        const user = await model.findOne({email});
+
+        if (!user) {
+            return res.status(400).json({message: 'The user does not exist'});
+        }
+        
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(400).json({message: 'The password is incorrect'});
+        }
+        
+        const token = jwt.sign(
+            {
+                id: user._id,
+                email: user.email
+            },
+            process.env.JWT_SECRET,
+            {expiresIn: '1h'}
+        );
+
+        return res.status(200).json({
+            message: 'Login successful',
+            token,
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email
+            }
+        });
+    } catch (err) {
+        console.error('Login error:', err);
+        return res.status(500).json({message: 'Internal server error'});
+    }
+};
+
+module.exports = {
+    registerUser,
+    loginUser
+};
