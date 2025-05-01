@@ -10,7 +10,7 @@ app.use(cors());
 app.use(express.json());
 
 const authRoutes = require('./routes/auth');
-const insertvehicleroutes = require('./routes/insertvehicleroutes');
+const vehicleroutes = require('./routes/vehicleroutes');
 
 mongoose.connect(process.env.MONGO_URL)
     .then((conn) => {
@@ -25,7 +25,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
-app.use('/api/admin', insertvehicleroutes);
+app.use('/api/admin', vehicleroutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

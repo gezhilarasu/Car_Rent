@@ -31,6 +31,34 @@ const registerUser= async (req,res)=>{
 
 };
 
+const registerAdmin = async (req,res)=>{
+    const {username,email,password,phone_number,address}=req.body;
+    const role_type='admin';
+    try{
+        const existingAdmin=await model.findOne({email});
+        if(existingAdmin)
+        {
+            return res.status(400).json({message:'Admin already exists'});
+        }
+        const hashedpassword=await bcrypt.hash(password,10);
+        const newAdmin=new model({
+            username,
+            email,
+            password:hashedpassword,
+            phone_number,
+            address,
+            role_type
+        });
+        await newAdmin.save();
+        return res.status(200).json({message:'Admin registered successfully'});
+    }
+    catch(err)
+    {
+        return res.status(500).json({message:'Internal server error'});
+    }
+
+}
+
 const loginUser = async (req, res) => {
     const {email, password} = req.body;
     
@@ -72,5 +100,6 @@ const loginUser = async (req, res) => {
 
 module.exports = {
     registerUser,
+    registerAdmin,
     loginUser
 };
