@@ -1,3 +1,4 @@
+const mongoose= require('mongoose');
 const bikeSchema = new mongoose.Schema({
     vehicle_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Vehicle' },
     bike_type: {
